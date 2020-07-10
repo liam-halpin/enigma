@@ -31,14 +31,36 @@ UKW_C = {"A":"F", "F":"A", "B":"V", "V":"B", "C":"P", "P":"C",
          "M":"X", "X":"M", "N":"W", "W":"N", "Q":"T", "T":"Q",
          "S":"U", "U":"S"}
 
+def shift_rotor(string, shift_value):
+    output = ""
+    for i in range(0, len(string)):
+        c = string[i]
+        code = ord(c)
+        if ((code >= 65) and (code <= 90)):
+            c = chr(((code - 65 + shift_value) % 26) + 65)
+        output += c
+    return output
 
+def contains_numbers(string):
+    return any(char.isdigit() for char in string)
+
+"""
+ configure()
+
+ This function will configure the Enigma's settings:
+    - The chosen rotors;
+    - The chosen reflector;
+    - The rotor starting positions;
+    - The plugboard settings;
+
+"""
 def configure():
     print("Configuring the Engima...")
 
     # Choose rotors (3 from a set of 5):
     chosen_rotors, choices = [], []
     while len(chosen_rotors) != 3:
-        choice = input("Choose a rotor (I, II, III, IV, V): ")
+        choice = input("Choose a rotor (I, II, III, IV, V): ").upper()
         if choice in choices: print("Rotor already chosen!"); continue
         elif choice == "I": chosen_rotors.append(rotorI); choices.append(choice)
         elif choice == "II": chosen_rotors.append(rotorII); choices.append(choice)
@@ -47,6 +69,15 @@ def configure():
         elif choice == "V": chosen_rotors.append(rotorV); choices.append(choice)
         else: print("Invalid input!")
     
+    # Assign chosen rotors and assigned notches
+    # RotorA = Left, RotorB = Middle, RotorC = Right
+    rotorA = rotors[choices[0]]
+    rotorB = rotors[choices[1]]
+    rotorC = rotors[choices[2]]
+    rotorA_notch = rotor_notches[choices[0]]
+    rotorB_notch = rotor_notches[choices[1]]
+    rotorC_notch = rotor_notches[choices[2]]
+
     # Choose a reflector (UKW_B or UKW_C):
     chosen_reflector = ""
     while chosen_reflector == "":
@@ -54,5 +85,20 @@ def configure():
         if choice == "B": chosen_reflector = UKW_B
         elif choice == "C": chosen_reflector = UKW_C
         else: print("Invalid input!")
+
+    # Choose a start position for each rotor
+    ring_positions = ""
+    while len(ring_positions) != 3:
+        choice = input("Choice the start positions for each rotor: e.g. ABC  ")
+        if len(choice) != 3 and (contains_numbers(choice)):
+            print("Invalid input!")
+        ring_positions = choice
     
+    ring_settings = ""
+    while len(ring_settings) != 3:
+        choice = input("Choose the initial ring settings e.g. ABC  ")
+        if len(choice) != 3 and (contains_numbers(choice)):
+            print("Invalid input!")
+        ring_settings = choice
+
 configure()
