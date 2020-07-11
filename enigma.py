@@ -44,6 +44,16 @@ def shift_rotor(string, shift_value):
 def contains_numbers(string):
     return any(char.isdigit() for char in string)
 
+def count_occurrences(string):
+    occurrences = {char : string.count(char) for char in set(string)}
+    return occurrences
+
+def used_twice(input_dict):
+    for key in input_dict:
+        if (input_dict[key] > 1):
+            return False
+    return True
+
 """
  configure()
 
@@ -51,6 +61,7 @@ def contains_numbers(string):
     - The chosen rotors;
     - The chosen reflector;
     - The rotor starting positions;
+    - The rotor settings
     - The plugboard settings;
 
 """
@@ -94,11 +105,24 @@ def configure():
             print("Invalid input!")
         ring_positions = choice
     
+    # Choose ring settings for each rotor
     ring_settings = ""
     while len(ring_settings) != 3:
         choice = input("Choose the initial ring settings e.g. ABC  ")
         if len(choice) != 3 and (contains_numbers(choice)):
             print("Invalid input!")
         ring_settings = choice
+    
+    # Choose the plugboard settings
+    plugboard_settings = ""
+    while (len(plugboard_settings) != 20):
+        chosen_settings = input("Please chooes the plugboard settings: e.g. (AT BS DE FM IR KN LZ OW PV XY)")
+        chosen_settings = chosen_settings.upper().split(" ")
+        plugboard_settings = "".join([str(elem) for elem in chosen_settings])
+        if (used_twice(count_occurrences(plugboard_settings)) == False):
+            print("You have entered a letter more than once!")
+            plugboard_settings = ""
+            continue
+        
 
-configure()
+# configure()
