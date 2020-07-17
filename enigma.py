@@ -45,6 +45,8 @@ def contains_numbers(string):
     return any(char.isdigit() for char in string)
 
 def count_occurrences(string):
+    string = string.upper().split(" ")
+    string = "".join([str(elem) for elem in string])
     occurrences = {char : string.count(char) for char in set(string)}
     return occurrences
 
@@ -55,7 +57,7 @@ def used_twice(input_dict):
     return True
 
 """
- configure()
+ run()
 
  This function will configure the Enigma's settings:
     - The chosen rotors;
@@ -64,8 +66,10 @@ def used_twice(input_dict):
     - The rotor settings
     - The plugboard settings;
 
+ And then it will encode/decode the provided text
+
 """
-def configure():
+def run():
     print("Configuring the Engima...")
 
     # Choose rotors (3 from a set of 5):
@@ -104,6 +108,7 @@ def configure():
         if len(choice) != 3 and (contains_numbers(choice)):
             print("Invalid input!")
         ring_positions = choice
+
     
     # Choose ring settings for each rotor
     ring_settings = ""
@@ -112,17 +117,44 @@ def configure():
         if len(choice) != 3 and (contains_numbers(choice)):
             print("Invalid input!")
         ring_settings = choice
+
+    # Compute offset settings for each rotor
+    rotorA_offset = alphabet.index(ring_settings[0])
+    rotorB_offset = alphabet.index(ring_settings[1])
+    rotorC_offset = alphabet.index(ring_settings[2])
+
+    # Adjust rotors based on initial positions
+    rotorA = shift_rotor(rotorA, rotorA_offset)
+    rotorB = shift_rotor(rotorB, rotorB_offset)
+    rotorC = shift_rotor(rotorC, rotorC_offset)
+
+    if rotorA_offset > 0: rotorA = rotorA[26 - rotorA_offset:] + rotorA[0:26 - rotorA_offset]
+    if rotorB_offset > 0: rotorB = rotorB[26 - rotorB_offset:] + rotorB[0:26 - rotorB_offset]
+    if rotorC_offset > 0: rotorC = rotorC[26 - rotorC_offset:] + rotorC[0:26 - rotorC_offset]
     
     # Choose the plugboard settings
     plugboard_settings = ""
-    while (len(plugboard_settings) != 20):
-        chosen_settings = input("Please chooes the plugboard settings: e.g. (AT BS DE FM IR KN LZ OW PV XY)")
-        chosen_settings = chosen_settings.upper().split(" ")
-        plugboard_settings = "".join([str(elem) for elem in chosen_settings])
+    while (len(plugboard_settings) != 29):    # 10 pairs + 9 spaces
+        plugboard_settings = input("Please chooes the plugboard settings e.g. (AT BS DE FM IR KN LZ OW PV XY): ")
+        print(len(plugboard_settings))
         if (used_twice(count_occurrences(plugboard_settings)) == False):
             print("You have entered a letter more than once!")
             plugboard_settings = ""
             continue
-        
+    
+    # Convert specified plugboard settings into a dictionary
+    plugboard = plugboard_settings.upper().split(" ")
+    plugboard_dict = {}
+    for pair in plugboard:
+        if len(pair) == 2:
+            plugboard_dict[pair[0]] = pair[1]
+            plugboard_dict[pair[1]] = pair[0]
+    
+    output_text = ""
+    input_text = input("Please enter the text you wish to encode/decode: ")
 
-# configure()
+    for letter in input_text:
+        encrypted_letter = letter
+         
+
+run()
