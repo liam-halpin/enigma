@@ -136,7 +136,6 @@ def run():
     plugboard_settings = ""
     while (len(plugboard_settings) != 29):    # 10 pairs + 9 spaces
         plugboard_settings = input("Please chooes the plugboard settings e.g. (AT BS DE FM IR KN LZ OW PV XY): ")
-        print(len(plugboard_settings))
         if (used_twice(count_occurrences(plugboard_settings)) == False):
             print("You have entered a letter more than once!")
             plugboard_settings = ""
@@ -152,9 +151,76 @@ def run():
     
     output_text = ""
     input_text = input("Please enter the text you wish to encode/decode: ")
+    input_text = input_text.upper()
+
+    rotorA_letter, rotorB_letter, rotorC_letter = ring_positions[0], ring_positions[1], ring_positions[2]
 
     for letter in input_text:
-        encrypted_letter = letter
-         
+        encrypted_letter = letter  
+        
+        if letter in alphabet:
+            hit_notch = False
+            if rotorC_letter == rotorC_notch:
+                hit_notch = True 
+            rotorC_letter = alphabet[(alphabet.index(rotorC_letter) + 1) % 26]
+            if hit_notch:
+                hit_notch = False
+                if rotorB_letter == rotorB_notch:
+                    hit_notch = True 
+                    rotorB_letter = alphabet[(alphabet.index(rotorB_letter) + 1) % 26]
+        
+                if hit_notch:
+                    hit_notch = False
+                    rotorA_letter = alphabet[(alphabet.index(rotorA_letter) + 1) % 26]
+            else:
+                if rotorB_letter == rotorB_notch:
+                    rotorB_letter = alphabet[(alphabet.index(rotorB_letter) + 1) % 26]
+                    rotorA_letter = alphabet[(alphabet.index(rotorA_letter) + 1) % 26]
+                
+            if letter in plugboard_dict.keys() and plugboard_dict[letter] != "":
+                encrypted_letter = plugboard_dict[letter]
+            
+            rotorA_offset = alphabet.index(rotorA_letter)
+            rotorB_offset = alphabet.index(rotorB_letter)
+            rotorC_offset = alphabet.index(rotorC_letter)
 
-run()
+            pos = alphabet.index(encrypted_letter)
+            let = rotorC[(pos + rotorC_offset) % 26]
+            pos = alphabet.index(let)
+            encrypted_letter = alphabet[(pos - rotorC_offset + 26) % 26]
+            
+            pos = alphabet.index(encrypted_letter)
+            let = rotorB[(pos + rotorB_offset) % 26]
+            pos = alphabet.index(let)
+            encrypted_letter = alphabet[(pos - rotorB_offset + 26) % 26]
+            
+            pos = alphabet.index(encrypted_letter)
+            let = rotorA[(pos + rotorA_offset) % 26]
+            pos = alphabet.index(let)
+            encrypted_letter = alphabet[(pos - rotorA_offset + 26) % 26]
+            
+            if encrypted_letter in chosen_reflector.keys() and chosen_reflector[encrypted_letter] != "":
+                    encrypted_letter = chosen_reflector[encrypted_letter]
+
+            pos = alphabet.index(encrypted_letter)
+            let = alphabet[(pos + rotorA_offset)%26]
+            pos = rotorA.index(let)
+            encrypted_letter = alphabet[(pos - rotorA_offset + 26) % 26] 
+            
+            pos = alphabet.index(encrypted_letter)
+            let = alphabet[(pos + rotorB_offset)%26]
+            pos = rotorB.index(let)
+            encrypted_letter = alphabet[(pos - rotorB_offset + 26) % 26]
+            
+            pos = alphabet.index(encrypted_letter)
+            let = alphabet[(pos + rotorC_offset) % 26]
+            pos = rotorC.index(let)
+            encrypted_letter = alphabet[(pos - rotorC_offset + 26) % 26]
+            
+            if encrypted_letter in plugboard_dict.keys() and plugboard_dict[encrypted_letter] != "":
+                encrypted_letter = plugboard_dict[encrypted_letter]
+        output_text = output_text + encrypted_letter
+    return output_text
+   
+
+print(run())
